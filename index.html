@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDAM PARKOUR 3D</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #090b12;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+h1 {
+    margin: 20px 0 10px;
+}
+
+#game {
+    position: relative;
+    width: min(960px, 95%);
+    margin: auto;
+    overflow: hidden;
+    border-radius: 20px;
+    border: 2px solid #303644;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    background: #101522;
+}
+
+#hud {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.box {
+    background: #080a0ddd;
+    padding: 9px 14px;
+    border-radius: 12px;
+}
+
+#menu {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0008;
+}
+
+.panel {
+    background: #101522;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #ffffff22;
+}
+
+button {
+    background: #38bdf8;
+    color: #061018;
+    border: 0;
+    padding: 13px 22px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.controls {
+    margin: 12px;
+}
+
+.controls button {
+    background: #1b2230;
+    color: white;
+    border: 1px solid #384152;
+}
+
+#message {
+    margin: 10px;
+    color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏃 EDAM PARKOUR 3D</h1>
+
+<div id="game">
+
+<canvas id="canvas" width="960" height="540"></canvas>
+
+<div id="hud">
+    <div class="box">⭐ Score: <span id="score">0</span></div>
+    <div class="box">🪙 Coins: <span id="coins">0</span></div>
+    <div class="box">🏁 Stage: <span id="stage">1</span>/5</div>
+</div>
+
+<div id="menu">
+    <div class="panel">
+        <h2>EDAM PARKOUR 🚀</h2>
+        <p>اجمع العملات وتجنب العقبات!</p>
+        <button onclick="startGame()">ابدأ اللعب</button>
+    </div>
+</div>
+
+</div>
+
+<div class="controls">
+    <button id="left">◀ يسار</button>
+    <button id="jump">⬆ قفز</button>
+    <button id="right">يمين ▶</button>
+</div>
+
+<div id="message">
+    A / D أو الأسهم للتحرك — Space للقفز
+</div>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const scoreText = document.getElementById("score");
+const coinsText = document.getElementById("coins");
+const stageText = document.getElementById("stage");
+const menu = document.getElementById("menu");
+
+let gameRunning = false;
+
+let score = 0;
+let coins = 0;
+let stage = 1;
+
+let keys = {};
+
+const player = {
+    x: 100,
+    y: 400,
+    width: 32,
+    height: 42,
+    speed: 5,
+    velocityY: 0,
+    jumping: false
+};
+
+let platforms = [];
+let coinObjects = [];
+let spikes = [];
+
+function createLevel() {
+
+    platforms = [];
+    coinObjects = [];
+    spikes = [];
+
+    // الأرض
+    platforms.push({
+        x: 0,
+        y: 480,
+        width: 960,
+        height: 60
+    });
+
+    // المنصات
+    for (let i = 0; i < 10; i++) {
+
+        let x = 70 + i * 90;
+        let y = 400 - (i % 3) * 60;
+
+        platforms.push({
+            x: x,
+            y: y,
+            width: 100,
+            height: 18
+        });
+
+        // عملة
+        coinObjects.push({
+            x: x + 50,
+            y: y - 25,
+            collected: false
+        });
+
+        // شوكة
+        if (i % 3 === 2) {
+
+            spikes.push({
+                x: x + 65,
+                y: y - 20,
+                width: 25,
+                height: 20
+            });
+        }
+    }
+
+    player.x = 80;
+    player.y = 420;
+    player.velocityY = 0;
+}
+
+function updateHUD() {
+
+    scoreText.textContent = score;
+    coinsText.textContent = coins;
+    stageText.textContent = stage;
+
+}
+
+function jump() {
+
+    if (!player.jumping) {
+
+        player.velocityY = -13;
+        player.jumping = true;
+
+    }
+
+}
+
+function update() {
+
+    if (!gameRunning) return;
+
+    // الحركة
+    if (keys["ArrowLeft"] || keys["a"]) {
+
+        player.x -= player.speed;
+
+    }
+
+    if (keys["ArrowRight"] || keys["d"]) {
+
+        player.x += player.speed;
+
+    }
+
+    // الجاذبية
+    player.velocityY += 0.6;
+    player.y += player.velocityY;
+
+    player.jumping = true;
+
+    // التصادم مع المنصات
+    for (let platform of platforms) {
+
+        if (
+            player.x + player.width > platform.x &&
+            player.x < platform.x + platform.width &&
+            player.y + player.height >= platform.y &&
+            player.y + player.height <= platform.y + 20 &&
+            player.velocityY >= 0
+        ) {
+
+            player.y = platform.y - player.height;
+            player.velocityY = 0;
+            player.jumping = false;
+
+        }
+
+    }
+
+    // جمع العملات
+    for (let coin of coinObjects) {
+
+        if (!coin.collected) {
+
+            let dx = player.x + 16 - coin.x;
+            let dy = player.y + 20 - coin.y;
+
+            let distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 30) {
+
+                coin.collected = true;
+
+                coins++;
+                score += 100;
+
+                updateHUD();
+
+            }
+
+        }
+
+    }
+
+    // الشوك
+    for (let spike of spikes) {
+
+        if (
+            player.x + player.width > spike.x &&
+            player.x < spike.x + spike.width &&
+            player.y + player.height > spike.y &&
+            player.y < spike.y + spike.height
+        ) {
+
+            gameOver();
+
+        }
+
+    }
+
+    // سقوط
+    if (player.y > 550) {
+
+        gameOver();
+
+    }
+
+    // نهاية المرحلة
+    if (player.x > 900) {
+
+        if (coins >= stage * 2) {
+
+            nextStage();
+
+        }
+
+    }
+
+    // حدود الشاشة
+    if (player.x < 0) player.x = 0;
+
+    if (player.x > 928) player.x = 928;
+
+}
+
+function draw() {
+
+    // السماء
+    let gradient = ctx.createLinearGradient(
+        0, 0, 0, 540
+    );
+
+    gradient.addColorStop(0, "#18294a");
+    gradient.addColorStop(1, "#090b12");
+
+    ctx.fillStyle = gradient;
+
+    ctx.fillRect(0, 0, 960, 540);
+
+    // نجوم
+    ctx.fillStyle = "#ffffff";
+
+    for (let i = 0; i < 35; i++) {
+
+        let x = (i * 137) % 960;
+        let y = (i * 71) % 300;
+
+        ctx.fillRect(x, y, 2, 2);
+
+    }
+
+    // المنصات
+    for (let platform of platforms) {
+
+        ctx.fillStyle = "#4b5563";
+
+        ctx.fillRect(
+            platform.x,
+            platform.y,
+            platform.width,
+            platform.height
+        );
+
+        ctx.fillStyle = "#22c55e";
+
+        ctx.fillRect(
+            platform.x,
+            platform.y,
+            platform.width,
+            5
+        );
+
+    }
+
+    // العملات
+    for (let coin of coinObjects) {
+
+        if (!coin.collected) {
+
+            ctx.fillStyle = "#facc15";
+
+            ctx.beginPath();
+
+            ctx.arc(
+                coin.x,
+                coin.y,
+                10,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+            ctx.strokeStyle = "#fff";
+
+            ctx.stroke();
+
+        }
+
+    }
+
+    // الشوك
+    for (let spike of spikes) {
+
+        ctx.fillStyle = "#ef4444";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            spike.x,
+            spike.y + spike.height
+        );
+
+        ctx.lineTo(
+            spike.x + spike.width / 2,
+            spike.y
+        );
+
+        ctx.lineTo(
+            spike.x + spike.width,
+            spike.y + spike.height
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+    // اللاعب
+    ctx.fillStyle = "#38bdf8";
+
+    ctx.fillRect(
+        player.x,
+        player.y,
+        player.width,
+        player.height
+    );
+
+    // العين
+    ctx.fillStyle = "#07111f";
+
+    ctx.fillRect(
+        player.x + 6,
+        player.y + 9,
+        6,
+        6
+    );
+
+    ctx.fillRect(
+        player.x + 20,
+        player.y + 9,
+        6,
+        6
+    );
+
+    // الاسم
+    ctx.fillStyle = "white";
+
+    ctx.font = "bold 12px Arial";
+
+    ctx.fillText(
+        "EDAM",
+        player.x - 2,
+        player.y - 8
+    );
+
+    // النهاية
+    ctx.font = "bold 18px Arial";
+
+    ctx.fillText(
+        "FINISH →",
+        820,
+        450
+    );
+
+}
+
+function gameLoop() {
+
+    update();
+
+    draw();
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+function startGame() {
+
+    score = 0;
+    coins = 0;
+    stage = 1;
+
+    updateHUD();
+
+    createLevel();
+
+    menu.style.display = "none";
+
+    gameRunning = true;
+
+}
+
+function nextStage() {
+
+    stage++;
+
+    score += 500;
+
+    if (stage > 5) {
+
+        gameWin();
+
+        return;
+
+    }
+
+    createLevel();
+
+    updateHUD();
+
+}
+
+function gameOver() {
+
+    gameRunning = false;
+
+    menu.style.display = "flex";
+
+    menu.innerHTML = `
+        <div class="panel">
+            <h2>💥 خسرت!</h2>
+            <p>Score: ${score}</p>
+            <p>Coins: ${coins}</p>
+            <button onclick="startGame()">إعادة اللعب</button>
+        </div>
+    `;
+
+}
+
+function gameWin() {
+
+    gameRunning = false;
+
+    menu.style.display = "flex";
+
+    menu.innerHTML = `
+        <div class="panel">
+            <h2>🏆 فزت!</h2>
+            <p>أكملت جميع المراحل!</p>
+            <p>⭐ Score: ${score}</p>
+            <p>🪙 Coins: ${coins}</p>
+            <button onclick="startGame()">العب من جديد</button>
+        </div>
+    `;
+
+}
+
+document.addEventListener("keydown", function(event) {
+
+    keys[event.key] = true;
+
+    if (
+        event.key === " " ||
+        event.key === "ArrowUp"
+    ) {
+
+        jump();
+
+    }
+
+});
+
+document.addEventListener("keyup", function(event) {
+
+    keys[event.key] = false;
+
+});
+
+document.getElementById("jump").addEventListener(
+    "click",
+    jump
+);
+
+document.getElementById("left").addEventListener(
+    "pointerdown",
+    () => keys["ArrowLeft"] = true
+);
+
+document.getElementById("left").addEventListener(
+    "pointerup",
+    () => keys["ArrowLeft"] = false
+);
+
+document.getElementById("right").addEventListener(
+    "pointerdown",
+    () => keys["ArrowRight"] = true
+);
+
+document.getElementById("right").addEventListener(
+    "pointerup",
+    () => keys["ArrowRight"] = false
+);
+
+createLevel();
+
+updateHUD();
+
+gameLoop();
+
+</script>
+
+</body>
+</html>

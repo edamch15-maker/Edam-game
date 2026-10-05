@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EDAM ESCAPE</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    user-select:none;
+}
+
+body{
+    margin:0;
+    overflow:hidden;
+    background:#05070b;
+    font-family:Arial,sans-serif;
+    color:white;
+}
+
+#game{
+    width:100vw;
+    height:100vh;
+    position:relative;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 40%,#17243b,#05070b 70%);
+}
+
+/* الخلفية */
+
+.wall{
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(90deg,
+        rgba(0,0,0,.8),
+        transparent 20%,
+        transparent 80%,
+        rgba(0,0,0,.8)),
+        repeating-linear-gradient(
+        90deg,
+        #101725 0px,
+        #101725 90px,
+        #172235 92px,
+        #172235 94px
+        );
+}
+
+/* الأرض */
+
+.floor{
+    position:absolute;
+    left:5%;
+    right:5%;
+    bottom:-10%;
+    height:65%;
+    background:
+        repeating-linear-gradient(
+        90deg,
+        #151b26 0px,
+        #151b26 75px,
+        #202938 77px,
+        #202938 80px
+        );
+    transform:perspective(500px) rotateX(55deg);
+    transform-origin:bottom;
+}
+
+/* HUD */
+
+#hud{
+    position:absolute;
+    top:15px;
+    left:15px;
+    z-index:20;
+    padding:12px 18px;
+    background:rgba(0,0,0,.7);
+    border:1px solid #00eaff;
+    border-radius:12px;
+    line-height:1.8;
+}
+
+#message{
+    position:absolute;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:20;
+    color:#00eaff;
+    font-size:20px;
+    font-weight:bold;
+}
+
+/* اللاعب */
+
+#player{
+    position:absolute;
+    width:38px;
+    height:55px;
+    left:50%;
+    bottom:80px;
+    transform:translateX(-50%);
+    z-index:10;
+    background:linear-gradient(90deg,#111,#00eaff,#111);
+    border-radius:10px;
+    box-shadow:0 0 20px #00eaff;
+}
+
+#player:before{
+    content:"";
+    position:absolute;
+    width:25px;
+    height:20px;
+    left:6px;
+    top:7px;
+    background:#bdf8ff;
+    border-radius:5px;
+}
+
+/* العقبات */
+
+.obstacle{
+    position:absolute;
+    z-index:8;
+    border-radius:8px;
+    box-shadow:0 0 18px rgba(255,0,80,.5);
+}
+
+.red{
+    background:#ff1744;
+}
+
+.blue{
+    background:#8a2be2;
+}
+
+.green{
+    background:#00d084;
+}
+
+/* العملات */
+
+.coin{
+    position:absolute;
+    width:25px;
+    height:25px;
+    border-radius:50%;
+    background:#ffd900;
+    box-shadow:0 0 20px #ffd900;
+    z-index:9;
+}
+
+/* البداية والنهاية */
+
+.screen{
+    position:absolute;
+    inset:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+    background:rgba(0,0,0,.88);
+}
+
+.screen h1{
+    font-size:55px;
+    color:#00eaff;
+    text-shadow:0 0 25px #00eaff;
+    margin:10px;
+}
+
+.screen p{
+    font-size:19px;
+    color:#bbb;
+    max-width:600px;
+    line-height:1.7;
+}
+
+button{
+    border:0;
+    padding:15px 40px;
+    border-radius:12px;
+    background:#00eaff;
+    color:#001018;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+/* التحكم */
+
+.controls{
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:30;
+    display:flex;
+    gap:20px;
+}
+
+.controls button{
+    width:75px;
+    height:60px;
+    padding:0;
+    background:rgba(0,0,0,.7);
+    color:white;
+    border:1px solid #00eaff;
+}
+
+/* رسالة المستوى */
+
+#levelText{
+    position:absolute;
+    inset:0;
+    z-index:80;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.7);
+    font-size:55px;
+    font-weight:bold;
+    color:#00eaff;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div class="wall"></div>
+    <div class="floor"></div>
+
+    <div id="message">
+        اهرب إلى الباب الأخضر!
+    </div>
+
+    <div id="hud">
+        ❤️ المحاولات: <span id="lives">3</span>
+        <br>
+        💰 Coins: <span id="coins">0</span>
+        <br>
+        🏆 Level: <span id="level">1</span>
+        <br>
+        ⏱️ الوقت: <span id="time">60</span>
+    </div>
+
+    <div id="player"></div>
+
+    <div class="controls">
+        <button onclick="move(-1)">⬅️</button>
+        <button onclick="move(1)">➡️</button>
+    </div>
+
+
+    <!-- البداية -->
+
+    <div class="screen" id="startScreen">
+
+        <h1>EDAM ESCAPE</h1>
+
+        <p>
+            🏃 اهرب من العقبات<br>
+            💰 اجمع العملات<br>
+            🚪 وصل إلى الباب الأخضر قبل انتهاء الوقت!
+        </p>
+
+        <p>
+            التحكم: A / D أو الأسهم ⬅️ ➡️
+        </p>
+
+        <button onclick="startGame()">
+            ▶ ابدأ اللعبة
+        </button>
+
+    </div>
+
+
+    <!-- المستوى -->
+
+    <div id="levelText">
+        LEVEL 1
+    </div>
+
+
+    <!-- النهاية -->
+
+    <div class="screen" id="endScreen" style="display:none">
+
+        <h1 id="endTitle">
+            🏆 فزت!
+        </h1>
+
+        <p id="result">
+            أحسنت!
+        </p>
+
+        <button onclick="location.reload()">
+            🔄 العب مرة أخرى
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let player;
+let gameRunning=false;
+
+let playerX=50;
+
+let lives=3;
+let coins=0;
+let level=1;
+let time=60;
+
+let objects=[];
+
+let keys={};
+
+document.addEventListener("keydown",e=>{
+
+    keys[e.key.toLowerCase()]=true;
+
+    if(
+        e.key==="ArrowLeft" ||
+        e.key.toLowerCase()==="a"
+    ){
+        move(-1);
+    }
+
+    if(
+        e.key==="ArrowRight" ||
+        e.key.toLowerCase()==="d"
+    ){
+        move(1);
+    }
+
+});
+
+document.addEventListener("keyup",e=>{
+    keys[e.key.toLowerCase()]=false;
+});
+
+
+function startGame(){
+
+    document.getElementById("startScreen").style.display="none";
+
+    player=document.getElementById("player");
+
+    gameRunning=true;
+
+    createLevel();
+
+    showLevel();
+
+    gameLoop();
+
+    setInterval(()=>{
+        if(gameRunning){
+
+            time--;
+
+            document.getElementById("time").textContent=time;
+
+            if(time<=0){
+                loseLife();
+            }
+
+        }
+    },1000);
+}
+
+
+function showLevel(){
+
+    const box=document.getElementById("levelText");
+
+    box.textContent="LEVEL "+level;
+
+    box.style.display="flex";
+
+    setTimeout(()=>{
+        box.style.display="none";
+    },1200);
+}
+
+
+function createLevel(){
+
+    objects.forEach(o=>o.remove());
+
+    objects=[];
+
+    /* العقبات */
+
+    for(let i=0;i<5+level*2;i++){
+
+        let obstacle=document.createElement("div");
+
+        obstacle.className="obstacle "+(
+            i%3===0 ? "red" :
+            i%3===1 ? "blue" :
+            "green"
+        );
+
+        obstacle.style.width=(50+Math.random()*50)+"px";
+
+        obstacle.style.height="30px";
+
+        obstacle.style.left=(20+Math.random()*60)+"%";
+
+        obstacle.style.top=(-100-Math.random()*700)+"px";
+
+        document.getElementById("game").appendChild(obstacle);
+
+        objects.push(obstacle);
+    }
+
+
+    /* العملات */
+
+    for(let i=0;i<4+level;i++){
+
+        let coin=document.createElement("div");
+
+        coin.className="coin";
+
+        coin.style.left=(20+Math.random()*60)+"%";
+
+        coin.style.top=(-100-Math.random()*900)+"px";
+
+        document.getElementById("game").appendChild(coin);
+
+        objects.push(coin);
+    }
+
+
+    /* الباب */
+
+    let exit=document.createElement("div");
+
+    exit.id="exit";
+
+    exit.style.position="absolute";
+    exit.style.width="70px";
+    exit.style.height="100px";
+    exit.style.right="10%";
+    exit.style.top="-150px";
+    exit.style.background="#00ff66";
+    exit.style.borderRadius="10px";
+    exit.style.boxShadow="0 0 30px #00ff66";
+    exit.style.zIndex="7";
+
+    document.getElementById("game").appendChild(exit);
+
+    objects.push(exit);
+}
+
+
+function move(direction){
+
+    if(!gameRunning)return;
+
+    playerX += direction*5;
+
+    if(playerX<18)playerX=18;
+
+    if(playerX>82)playerX=82;
+
+    player.style.left=playerX+"%";
+}
+
+
+function gameLoop(){
+
+    if(!gameRunning)return;
+
+    objects.forEach(obj=>{
+
+        let top=parseFloat(obj.style.top);
+
+        top += 4 + level*0.8;
+
+        obj.style.top=top+"px";
+
+
+        if(top>window.innerHeight+100){
+
+            obj.style.top=(-100-Math.random()*500)+"px";
+
+            obj.style.left=(18+Math.random()*64)+"%";
+        }
+
+
+        checkCollision(obj);
+
+    });
+
+
+    requestAnimationFrame(gameLoop);
+}
+
+
+function checkCollision(obj){
+
+    let a=player.getBoundingClientRect();
+
+    let b=obj.getBoundingClientRect();
+
+
+    if(
+        a.left<b.right &&
+        a.right>b.left &&
+        a.top<b.bottom &&
+        a.bottom>b.top
+    ){
+
+        if(obj.classList.contains("coin")){
+
+            coins++;
+
+            document.getElementById("coins").textContent=coins;
+
+            obj.style.top="-500px";
+
+        }
+
+        else if(obj.id==="exit"){
+
+            nextLevel();
+
+        }
+
+        else{
+
+            obj.style.top="-500px";
+
+            loseLife();
+
+        }
+
+    }
+
+}
+
+
+function loseLife(){
+
+    lives--;
+
+    document.getElementById("lives").textContent=lives;
+
+    time=60;
+
+    if(lives<=0){
+
+        gameOver(false);
+
+    }
+
+}
+
+
+function nextLevel(){
+
+    level++;
+
+    document.getElementById("level").textContent=level;
+
+    time=60;
+
+    if(level>4){
+
+        gameOver(true);
+
+        return;
+    }
+
+    createLevel();
+
+    showLevel();
+}
+
+
+function gameOver(win){
+
+    gameRunning=false;
+
+    document.getElementById("endScreen").style.display="flex";
+
+    if(win){
+
+        document.getElementById("endTitle").textContent="🏆 أنت البطل!";
+
+        document.getElementById("result").textContent=
+            "أكملت جميع المراحل! Coins: "+coins;
+
+    }else{
+
+        document.getElementById("endTitle").textContent="💀 خسرت!";
+
+        document.getElementById("result").textContent=
+            "وصلت إلى Level "+level+" — Coins: "+coins;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

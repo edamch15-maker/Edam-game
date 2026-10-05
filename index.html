@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EDAM GAMES</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #070b12;
+            color: white;
+        }
+
+        /* HEADER */
+
+        header {
+            padding: 20px 7%;
+            background: #0d121c;
+            border-bottom: 1px solid #202b3d;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00eaff;
+            text-shadow: 0 0 15px #00eaff;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 25px;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            color: #00eaff;
+        }
+
+        /* HERO */
+
+        .hero {
+            min-height: 430px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            text-align: center;
+
+            padding: 50px 20px;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    #123047,
+                    #070b12 70%
+                );
+        }
+
+        .hero h1 {
+            font-size: 65px;
+            color: #00eaff;
+
+            text-shadow:
+                0 0 15px #00eaff,
+                0 0 35px #00eaff;
+
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            color: #aaa;
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .hero-button {
+            display: inline-block;
+
+            padding: 15px 35px;
+
+            background: #00eaff;
+            color: #061018;
+
+            text-decoration: none;
+
+            border-radius: 10px;
+
+            font-weight: bold;
+
+            transition: .2s;
+        }
+
+        .hero-button:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 25px #00eaff;
+        }
+
+        /* GAMES */
+
+        .games-section {
+            padding: 60px 7%;
+        }
+
+        .games-section h2 {
+            text-align: center;
+            font-size: 38px;
+            margin-bottom: 40px;
+        }
+
+        .games {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(270px, 1fr));
+
+            gap: 30px;
+
+            max-width: 1000px;
+
+            margin: auto;
+        }
+
+        /* GAME CARD */
+
+        .game {
+            background: #101722;
+
+            border: 1px solid #243044;
+
+            border-radius: 16px;
+
+            overflow: hidden;
+
+            transition: .25s;
+        }
+
+        .game:hover {
+            transform: translateY(-8px);
+
+            border-color: #00eaff;
+
+            box-shadow:
+                0 0 30px
+                rgba(0,234,255,.2);
+        }
+
+        /* IMAGE */
+
+        .image {
+            height: 210px;
+
+            position: relative;
+
+            background: #151c28;
+        }
+
+        .image img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+        }
+
+        .tag {
+            position: absolute;
+
+            top: 12px;
+            left: 12px;
+
+            padding: 7px 12px;
+
+            background: #00eaff;
+
+            color: #061018;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+        }
+
+        /* INFO */
+
+        .info {
+            padding: 22px;
+        }
+
+        .info h3 {
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .info p {
+            color: #aaa;
+
+            line-height: 1.6;
+
+            margin-bottom: 20px;
+
+            min-height: 50px;
+        }
+
+        /* PLAY BUTTON */
+
+        .play {
+            display: block;
+
+            text-align: center;
+
+            padding: 13px;
+
+            background: #00eaff;
+
+            color: #061018;
+
+            text-decoration: none;
+
+            border-radius: 9px;
+
+            font-weight: bold;
+
+            transition: .2s;
+        }
+
+        .play:hover {
+            background: white;
+
+            box-shadow:
+                0 0 20px
+                #00eaff;
+        }
+
+        /* FOOTER */
+
+        footer {
+            margin-top: 60px;
+
+            padding: 30px;
+
+            text-align: center;
+
+            background: #0d121c;
+
+            color: #666;
+
+            border-top: 1px solid #202b3d;
+        }
+
+        /* MOBILE */
+
+        @media(max-width:600px) {
+
+            nav {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 43px;
+            }
+
+            .hero p {
+                font-size: 17px;
+            }
+
+            .games-section {
+                padding: 45px 5%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- HEADER -->
+
+<header>
+
+    <div class="logo">
+        EDAM GAMES
+    </div>
+
+    <nav>
+
+        <a href="index.html">
+            الرئيسية
+        </a>
+
+        <a href="#games">
+            الألعاب
+        </a>
+
+    </nav>
+
+</header>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <div>
+
+        <h1>
+            EDAM GAMES
+        </h1>
+
+        <p>
+            🎮 العب ألعاب EDAM واستمتع بالتحديات!
+        </p>
+
+        <a
+            href="#games"
+            class="hero-button"
+        >
+            🎮 شاهد الألعاب
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- GAMES -->
+
+<section
+    class="games-section"
+    id="games"
+>
+
+    <h2>
+        🎮 ألعابنا
+    </h2>
+
+
+    <div class="games">
+
+
+        <!-- SPEED RACE -->
+
+        <div class="game">
+
+            <div class="image">
+
+                <img
+                    src="game3.jpg"
+                    alt="Speed Race"
+                >
+
+                <div class="tag">
+                    🏎️ RACING
+                </div>
+
+            </div>
+
+
+            <div class="info">
+
+                <h3>
+                    Speed Race
+                </h3>
+
+                <p>
+                    🏎️ سباق سريع! تجاوز السيارات
+                    وحاول تحقيق أعلى نتيجة.
+                </p>
+
+                <a
+                    class="play"
+                    href="speed.html"
+                >
+                    ▶ العب الآن
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- EDAM ESCAPE -->
+
+        <div class="game">
+
+            <div class="image">
+
+                <img
+                    src="game4.jpg"
+                    alt="EDAM Escape"
+                >
+
+                <div class="tag">
+                    🏃 ESCAPE
+                </div>
+
+            </div>
+
+
+            <div class="info">
+
+                <h3>
+                    EDAM Escape
+                </h3>
+
+                <p>
+                    🏃 اهرب من العقبات، اجمع Coins
+                    وأكمل جميع المراحل!
+                </p>
+
+                <a
+                    class="play"
+                    href="escape.html"
+                >
+                    ▶ العب الآن
+                </a>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    © 2026 EDAM GAMES 🎮
+
+</footer>
+
+
+</body>
+
+</html>

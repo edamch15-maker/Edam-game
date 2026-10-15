@@ -135,39 +135,6 @@
             display: block;
         }
 
-        .neon-image {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background:
-                radial-gradient(ellipse at center, #152b66 0%, #090e20 55%, #03050b 100%);
-        }
-
-        .neon-art {
-            text-align: center;
-            color: #00eaff;
-            text-shadow: 0 0 12px #00eaff, 0 0 30px #006aff;
-        }
-
-        .neon-art .symbol {
-            font-size: 75px;
-            line-height: 1.2;
-            display: block;
-        }
-
-        .neon-art strong {
-            display: block;
-            font-size: 27px;
-            letter-spacing: 4px;
-        }
-
-        .neon-art small {
-            display: block;
-            color: #ff36dc;
-            margin-top: 8px;
-            letter-spacing: 5px;
-        }
-
         .tag {
             position: absolute;
             top: 12px;
@@ -178,6 +145,30 @@
             border-radius: 8px;
             font-size: 12px;
             font-weight: bold;
+            z-index: 2;
+        }
+
+        /* صورة بديلة بتصميم نيون */
+        .fallback {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+            background: radial-gradient(circle, #153c60, #080d19 75%);
+            color: #00eaff;
+            text-shadow: 0 0 15px #00eaff;
+        }
+
+        .fallback .symbol {
+            font-size: 65px;
+        }
+
+        .fallback strong {
+            font-size: 25px;
+            letter-spacing: 2px;
         }
 
         .info {
@@ -267,10 +258,7 @@
         <div>
             <h1>EDAM GAMES</h1>
             <p>🎮 العب ألعاب EDAM واستمتع بالتحديات!</p>
-
-            <a href="#games" class="hero-button">
-                🎮 شاهد الألعاب
-            </a>
+            <a href="#games" class="hero-button">🎮 شاهد الألعاب</a>
         </div>
     </section>
 
@@ -280,26 +268,22 @@
         <div class="games">
 
             <!-- NEON RUNNER -->
-
             <div class="game">
-                <div class="image neon-image">
-                    <div class="neon-art">
+                <div class="image">
+                    <div class="fallback">
                         <span class="symbol">⚡</span>
                         <strong>NEON RUNNER</strong>
-                        <small>3D EXPERIENCE</small>
+                        <span>3D EXPERIENCE</span>
                     </div>
-
                     <div class="tag">⚡ 3D RUNNER</div>
                 </div>
 
                 <div class="info">
                     <h3>NEON RUNNER</h3>
-
                     <p>
                         🏃 انطلق في عالم نيون ثلاثي الأبعاد،
                         تفادَ العقبات واجمع النقاط وحاول تحطيم رقمك القياسي!
                     </p>
-
                     <a class="play neon-play" href="neon-runner.html">
                         ⚡ العب NEON RUNNER
                     </a>
@@ -307,48 +291,56 @@
             </div>
 
             <!-- SPEED RACE -->
-
             <div class="game">
                 <div class="image">
-                    <img src="speed-race.png" alt="Speed Race">
+                    <img
+                        src="speed-race.png"
+                        alt="Speed Race"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                    <div class="fallback" style="display:none">
+                        <span class="symbol">🏎️</span>
+                        <strong>SPEED RACE</strong>
+                        <span>RACING GAME</span>
+                    </div>
 
                     <div class="tag">🏎️ RACING</div>
                 </div>
 
                 <div class="info">
                     <h3>Speed Race</h3>
-
                     <p>
                         🏎️ سباق سريع! تجاوز السيارات
                         وحاول تحقيق أعلى نتيجة.
                     </p>
-
-                    <a class="play" href="speed.html">
-                        ▶ العب الآن
-                    </a>
+                    <a class="play" href="speed.html">▶ العب الآن</a>
                 </div>
             </div>
 
             <!-- EDAM ESCAPE -->
-
             <div class="game">
                 <div class="image">
-                    <img src="edam-escape.png" alt="EDAM Escape">
+                    <img
+                        src="edam-escape.png"
+                        alt="EDAM Escape"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                    <div class="fallback" style="display:none">
+                        <span class="symbol">🏃</span>
+                        <strong>EDAM ESCAPE</strong>
+                        <span>ESCAPE CHALLENGE</span>
+                    </div>
 
                     <div class="tag">🏃 ESCAPE</div>
                 </div>
 
                 <div class="info">
                     <h3>EDAM Escape</h3>
-
                     <p>
                         🏃 اهرب من العقبات، اجمع Coins
                         وأكمل جميع المراحل!
                     </p>
-
-                    <a class="play" href="escape.html">
-                        ▶ العب الآن
-                    </a>
+                    <a class="play" href="escape.html">▶ العب الآن</a>
                 </div>
             </div>
 

@@ -354,14 +354,15 @@
         © 2026 EDAM GAMES 🎮
     </footer>
     
+
 <script>
 if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js")
-            .catch(error => console.error("PWA error:", error));
-    });
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js");
+  });
 }
 </script>
+
     
 </body>
 </html>

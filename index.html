@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -7,9 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDAM GAMES</title>
 
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#070b13">
-
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#070b13">
 
     <style>
         * {
@@ -25,7 +24,7 @@
         }
 
         header {
-            padding: 20px 7%;
+            padding: 12px 7%;
             background: #0d121c;
             border-bottom: 1px solid #202b3d;
             display: flex;
@@ -36,11 +35,19 @@
             z-index: 100;
         }
 
+        /* شعار EDAM GAMES الجديد */
         .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #00eaff;
-            text-shadow: 0 0 15px #00eaff;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 170px;
+            height: 65px;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 0 8px rgba(0, 234, 255, 0.25));
         }
 
         nav a {
@@ -152,7 +159,6 @@
             z-index: 2;
         }
 
-        /* صورة بديلة بتصميم نيون */
         .fallback {
             height: 100%;
             display: flex;
@@ -228,6 +234,15 @@
         }
 
         @media (max-width: 600px) {
+            header {
+                padding: 10px 5%;
+            }
+
+            .logo img {
+                width: 135px;
+                height: 55px;
+            }
+
             nav {
                 display: none;
             }
@@ -250,7 +265,9 @@
 <body>
 
     <header>
-        <div class="logo">EDAM GAMES</div>
+        <a href="index.html" class="logo">
+            <img src="edam-logo.jpg" alt="EDAM GAMES Logo">
+        </a>
 
         <nav>
             <a href="index.html">الرئيسية</a>
@@ -354,17 +371,14 @@
     <footer>
         © 2026 EDAM GAMES 🎮
     </footer>
-    
 
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js");
-  });
-}
-</script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./service-worker.js");
+            });
+        }
+    </script>
 
-    
 </body>
 </html>
-```

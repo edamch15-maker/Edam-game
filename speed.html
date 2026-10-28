@@ -1,418 +1,421 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EDAM Speed Race</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Speed Race 3D | EDAM GAMES</title>
 <style>
-*{
-    box-sizing:border-box;
-}
-
-body{
-    margin:0;
-    overflow:hidden;
-    background:#111;
-    font-family:Arial,sans-serif;
-}
-
-#game{
-    width:100vw;
-    height:100vh;
-    position:relative;
-    overflow:hidden;
-    background:linear-gradient(#55bfff 0%,#bcecff 45%,#39a844 46%,#16852c 100%);
-}
-
-/* الطريق */
-
-.road{
-    position:absolute;
-    width:65vw;
-    height:150vh;
-    left:17.5vw;
-    top:-20vh;
-    background:#333;
-    transform:perspective(500px) rotateX(8deg);
-    border-left:12px solid #eee;
-    border-right:12px solid #eee;
-}
-
-.line{
-    position:absolute;
-    width:10px;
-    height:80px;
-    background:white;
-    left:50%;
-    transform:translateX(-50%);
-    opacity:.9;
-}
-
-.l1{top:0}
-.l2{top:160px}
-.l3{top:320px}
-.l4{top:480px}
-.l5{top:640px}
-.l6{top:800px}
-.l7{top:960px}
-.l8{top:1120px}
-
-/* HUD */
-
-#hud{
-    position:absolute;
-    top:15px;
-    left:15px;
-    z-index:20;
-    color:white;
-    background:rgba(0,0,0,.65);
-    padding:12px 18px;
-    border-radius:12px;
-    font-size:18px;
-}
-
-/* السيارات */
-
-.car{
-    position:absolute;
-    width:70px;
-    height:120px;
-    border-radius:15px 15px 8px 8px;
-    z-index:10;
-    box-shadow:0 5px 15px #000;
-}
-
-.player{
-    background:linear-gradient(90deg,#111,#e00000,#111);
-    bottom:45px;
-    left:calc(50% - 35px);
-}
-
-.player:before,
-.enemy:before{
-    content:"";
-    position:absolute;
-    width:48px;
-    height:38px;
-    left:11px;
-    top:15px;
-    background:#8bdcff;
-    border-radius:8px;
-}
-
-.player:after,
-.enemy:after{
-    content:"";
-    position:absolute;
-    width:50px;
-    height:35px;
-    left:10px;
-    bottom:12px;
-    background:#222;
-    border-radius:8px;
-}
-
-.enemy{
-    background:linear-gradient(90deg,#111,#1677ff,#111);
-}
-
-/* شاشة البداية */
-
-#start{
-    position:absolute;
-    inset:0;
-    z-index:50;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,.75);
-    color:white;
-    text-align:center;
-}
-
-#start h1{
-    font-size:48px;
-    margin:10px;
-    color:#00eaff;
-}
-
-#start p{
-    font-size:20px;
-}
-
-button{
-    border:0;
-    border-radius:12px;
-    padding:15px 35px;
-    font-size:20px;
-    font-weight:bold;
-    cursor:pointer;
-    background:#00eaff;
-    color:#111;
-}
-
-button:hover{
-    transform:scale(1.05);
-}
-
-/* أزرار التحكم */
-
-.controls{
-    position:absolute;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:30;
-    display:flex;
-    gap:25px;
-}
-
-.controls button{
-    width:80px;
-    height:65px;
-    padding:0;
-    font-size:30px;
-    background:rgba(0,0,0,.7);
-    color:white;
-}
-
-/* النهاية */
-
-#end{
-    position:absolute;
-    inset:0;
-    z-index:60;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    background:rgba(0,0,0,.8);
-    color:white;
-    text-align:center;
-}
-
-#end h1{
-    font-size:45px;
-    color:#00ff88;
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d17;font-family:Arial,sans-serif;touch-action:none;color:white}
+canvas{display:block}
+#hud{position:fixed;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:5}
+.panel{background:#071321c9;border:1px solid #2788ff66;backdrop-filter:blur(12px);border-radius:15px;padding:12px 18px;box-shadow:0 0 24px #007bff18}
+.brand{font-weight:900;letter-spacing:2px;color:#40baff}
+.small{font-size:12px;color:#b8c9dc}
+#speed{font-size:36px;font-weight:900;font-variant-numeric:tabular-nums}
+#speed small{font-size:13px;color:#7fd5ff}
+#help{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:5;text-align:center;font-size:12px;color:#cbd7e8;background:#071321bd;padding:10px 16px;border-radius:12px;pointer-events:none}
+#cameraBtn,#resetBtn{pointer-events:auto;background:#0b2c51;color:white;border:1px solid #359dff;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:bold}
+#cameraBtn:active,#resetBtn:active{background:#1974d2}
+#touch{position:fixed;bottom:22px;left:16px;right:16px;display:none;justify-content:space-between;align-items:end;z-index:10;pointer-events:none;direction:ltr}
+.touchGroup{display:flex;gap:10px;align-items:end}
+.touchBtn{pointer-events:auto;touch-action:none;user-select:none;width:65px;height:65px;border-radius:18px;border:2px solid #4baeff99;background:#092b4fbf;color:white;font-size:26px;font-weight:bold}
+.touchBtn.pressed{background:#168dffdd;transform:scale(.96)}
+.touchBtn.long{height:82px}
+#loading{position:fixed;inset:0;background:#07111f;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:30;text-align:center;padding:25px}
+#loading h1{color:#39baff;font-size:36px}
+#loading p{color:#bbd3e8}
+#start{background:#168dff;color:white;border:0;padding:15px 35px;border-radius:12px;font-size:19px;font-weight:bold;cursor:pointer}
+@media(pointer:coarse){
+#touch{display:flex}
+#help{bottom:115px;font-size:10px}
+.panel{padding:9px 11px}
+#speed{font-size:26px}
 }
 </style>
 </head>
-
 <body>
-
-<div id="game">
-
-    <div id="start">
-        <h1>🏎️ EDAM SPEED RACE</h1>
-        <p>استعمل ⬅️ ➡️ لتجنب السيارات</p>
-        <button onclick="startGame()">ابدأ السباق</button>
-    </div>
-
-    <div id="hud">
-        🏎️ السرعة: <span id="speed">0</span> KM/H
-        <br>
-        🏆 النقاط: <span id="score">0</span>
-    </div>
-
-    <div class="road">
-
-        <div class="line l1"></div>
-        <div class="line l2"></div>
-        <div class="line l3"></div>
-        <div class="line l4"></div>
-        <div class="line l5"></div>
-        <div class="line l6"></div>
-        <div class="line l7"></div>
-        <div class="line l8"></div>
-
-    </div>
-
-    <div id="player" class="car player"></div>
-
-    <div id="enemy1" class="car enemy"></div>
-    <div id="enemy2" class="car enemy"></div>
-    <div id="enemy3" class="car enemy"></div>
-
-    <div class="controls">
-        <button onclick="moveLeft()">⬅️</button>
-        <button onclick="moveRight()">➡️</button>
-    </div>
-
-    <div id="end">
-        <h1>🏆 انتهى السباق!</h1>
-        <h2>النقاط: <span id="finalScore">0</span></h2>
-        <button onclick="location.reload()">إعادة اللعب</button>
-    </div>
-
+<div id="loading">
+<h1>EDAM GAMES</h1>
+<h2>SPEED RACE 3D</h2>
+<p>مدينة ثلاثية الأبعاد • قيادة حرة • كاميرتان</p>
+<p id="loadStatus">جاري تحميل المحرك...</p>
+<button id="start" style="display:none">ابدأ القيادة</button>
 </div>
 
-<script>
+<div id="hud">
+<div class="panel">
+<div class="brand">SPEED RACE 3D</div>
+<div class="small">EDAM GAMES</div>
+<div id="speed">0 <small>KM/H</small></div>
+<div class="small" id="distance">المسافة: 0 م</div>
+</div>
+<div class="panel" style="display:flex;gap:7px;flex-direction:column">
+<button id="cameraBtn">📷 تغيير الكاميرا (C)</button>
+<button id="resetBtn">↻ إعادة السيارة (R)</button>
+<div class="small" id="cameraLabel">الكاميرا الخلفية</div>
+</div>
+</div>
 
-let player;
-let enemies = [];
+<div id="help">W / ↑ تسارع • S / ↓ فرامل ورجوع • A D / ← → توجيه • C كاميرا • R إعادة</div>
 
-let playerX;
-let score = 0;
-let speed = 0;
+<div id="touch">
+<div class="touchGroup">
+<button class="touchBtn" data-key="left">◀</button>
+<button class="touchBtn" data-key="right">▶</button>
+</div>
+<div class="touchGroup">
+<button class="touchBtn long" data-key="brake">▼</button>
+<button class="touchBtn long" data-key="gas">▲</button>
+</div>
+</div>
 
-let gameRunning = false;
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js";
 
-let keys = {};
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x9fc6e5);
+scene.fog=new THREE.FogExp2(0xa8c9df,0.0028);
 
-document.addEventListener("keydown", function(e){
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));
+renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.25;
+document.body.prepend(renderer.domElement);
 
-    keys[e.key] = true;
+const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,.08,1100);
+const hemi=new THREE.HemisphereLight(0xe7f5ff,0x526052,2.0);
+scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xffefcd,3.2);
+sun.position.set(-90,170,-110);
+sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-230;
+sun.shadow.camera.right=230;
+sun.shadow.camera.top=230;
+sun.shadow.camera.bottom=-230;
+sun.shadow.normalBias=.035;
+scene.add(sun);
 
-    if(e.key === "ArrowLeft"){
-        moveLeft();
-    }
+const mat=(color,roughness=1,metalness=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
+const roadMat=mat(0x29313a);
+const sidewalkMat=mat(0xa4a7a6);
+const grassMat=mat(0x557b50);
+const whiteMat=mat(0xe8e8db);
+const yellowMat=mat(0xe5c765);
+const darkMat=mat(0x111820,.65);
+const glassMat=new THREE.MeshPhysicalMaterial({color:0x193d55,metalness:.2,roughness:.12,transparent:true,opacity:.72,clearcoat:1});
+const chromeMat=mat(0xb9c5ce,.22,.8);
 
-    if(e.key === "ArrowRight"){
-        moveRight();
-    }
+function box(w,h,d,m,x=0,y=0,z=0,parent=scene){
+const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;
+}
+function plane(w,d,m,x=0,y=0,z=0){
+const o=new THREE.Mesh(new THREE.PlaneGeometry(w,d),m);
+o.rotation.x=-Math.PI/2;o.position.set(x,y,z);o.receiveShadow=true;scene.add(o);return o;
+}
+function seeded(seed){let s=seed;return ()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const rnd=seeded(54891);
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const citySize=1200;
+plane(citySize,citySize,grassMat);
 
+const roadWidth=24, block=100, lines=[];
+for(let i=-5;i<=5;i++)lines.push(i*block);
+for(const p of lines){
+plane(roadWidth,citySize,roadMat,p,.015,0);
+plane(citySize,roadWidth,roadMat,0,.018,p);
+plane(3,citySize,sidewalkMat,p-roadWidth/2-1.5,.04,0);
+plane(3,citySize,sidewalkMat,p+roadWidth/2+1.5,.04,0);
+plane(citySize,3,sidewalkMat,0,.045,p-roadWidth/2-1.5);
+plane(citySize,3,sidewalkMat,0,.045,p+roadWidth/2+1.5);
+for(let t=-580;t<=580;t+=15){
+if(Math.abs(t%block)<15)continue;
+box(.22,.025,6,yellowMat,p,.052,t);
+box(6,.025,.22,yellowMat,t,.054,p);
+}
+for(let q of lines){
+for(let k=-8;k<=8;k++){
+box(1.1,.028,.38,whiteMat,p+k*1.6,.065,q-9.6);
+box(.38,.028,1.1,whiteMat,p-9.6,.065,q+k*1.6);
+}
+}
+}
+
+const buildingMats=[
+mat(0x9ba7b0,.82),mat(0x647d90,.7),mat(0xc2b7a7,.88),
+mat(0x777f87,.78),mat(0x9e9690,.82),mat(0x607386,.66)
+];
+const windowMat=new THREE.MeshStandardMaterial({color:0x5d879f,metalness:.55,roughness:.2,emissive:0x152c3b,emissiveIntensity:.22});
+const buildingGroup=new THREE.Group();scene.add(buildingGroup);
+const windowMeshes=[];
+const windowGeo=new THREE.BoxGeometry(1,1,.08);
+
+function building(x,z,w,d,h){
+const m=pick(buildingMats);
+box(w,h,d,m,x,h/2,z,buildingGroup);
+box(w+.6,.65,d+.6,mat(0x414b53),x,h+.33,z,buildingGroup);
+const countX=Math.max(2,Math.floor(w/3.6));
+const countZ=Math.max(2,Math.floor(d/3.6));
+const floors=Math.floor(h/4);
+for(let floor=0;floor<floors;floor++){
+for(let i=0;i<countX;i++){
+const xx=x-w/2+(i+.5)*w/countX;
+for(const sign of [-1,1]){
+const o=new THREE.Mesh(windowGeo,windowMat);
+o.scale.set(Math.min(1.7,w/countX*.55),1.9,1);
+o.position.set(xx,2.7+floor*4,z+sign*(d/2+.055));
+windowMeshes.push(o);
+}
+}
+for(let i=0;i<countZ;i++){
+const zz=z-d/2+(i+.5)*d/countZ;
+for(const sign of [-1,1]){
+const o=new THREE.Mesh(windowGeo,windowMat);
+o.rotation.y=Math.PI/2;
+o.scale.set(Math.min(1.7,d/countZ*.55),1.9,1);
+o.position.set(x+sign*(w/2+.055),2.7+floor*4,zz);
+windowMeshes.push(o);
+}
+}
+}
+}
+for(let i=-5;i<5;i++)for(let j=-5;j<5;j++){
+const cx=i*block+block/2,cz=j*block+block/2;
+if(Math.abs(cx)<80&&Math.abs(cz)<80)continue;
+for(let a=0;a<2;a++)for(let b=0;b<2;b++){
+if(rnd()<.12)continue;
+const x=cx+(a-.5)*40,z=cz+(b-.5)*40;
+const h=18+rnd()*75;
+building(x,z,16+rnd()*12,16+rnd()*12,h);
+}
+}
+if(windowMeshes.length){
+const mergedWindows=new THREE.InstancedMesh(windowGeo,windowMat,windowMeshes.length);
+const dummy=new THREE.Object3D();
+windowMeshes.forEach((w,i)=>{
+dummy.position.copy(w.position);
+dummy.rotation.copy(w.rotation);
+dummy.scale.copy(w.scale);
+dummy.updateMatrix();
+mergedWindows.setMatrixAt(i,dummy.matrix);
+});
+mergedWindows.instanceMatrix.needsUpdate=true;
+buildingGroup.add(mergedWindows);
+}
+
+const trunkMat=mat(0x65503a),leafMat=mat(0x36734b);
+const trunkGeo=new THREE.CylinderGeometry(.35,.5,4,7);
+const leafGeo=new THREE.IcosahedronGeometry(3.3,1);
+function tree(x,z){
+const trunk=new THREE.Mesh(trunkGeo,trunkMat);
+trunk.position.set(x,2,z);scene.add(trunk);
+const crown=new THREE.Mesh(leafGeo,leafMat);
+crown.position.set(x,5.5,z);
+crown.scale.set(1,1.2,1);crown.castShadow=true;scene.add(crown);
+}
+for(let i=-5;i<=5;i++)for(let j=-5;j<=5;j++){
+if(rnd()<.65){
+const x=i*100+17,z=j*100+17;
+tree(x,z);
+}
+}
+
+function makeCar(color=0x087cfa,player=false){
+const root=new THREE.Group();
+const paint=mat(color,.24,.65);
+const tire=mat(0x15171b,.96);
+const wheelR=.76;
+box(2.25,.65,4.7,paint,0,1.13,0,root);
+box(2.1,.2,3.7,paint,0,1.58,-.12,root);
+const cabin=box(1.95,.87,2.5,glassMat,0,2.02,-.28,root);
+box(2.02,.14,2.55,paint,0,2.5,-.28,root);
+box(2.12,.2,.18,darkMat,0,1.32,-2.37,root);
+box(2.12,.2,.18,darkMat,0,1.32,2.37,root);
+for(const x of [-1.16,1.16]){
+for(const z of [-1.52,1.52]){
+const pivot=new THREE.Group();
+pivot.position.set(x,.78,z);root.add(pivot);
+const wheel=new THREE.Mesh(new THREE.CylinderGeometry(wheelR,wheelR,.36,16),tire);
+wheel.rotation.z=Math.PI/2;wheel.castShadow=true;pivot.add(wheel);
+const rim=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,.37,12),chromeMat);
+rim.rotation.z=Math.PI/2;pivot.add(rim);
+if(player)root.userData.wheels??=[];
+if(player)root.userData.wheels.push({pivot,wheel,rim,z});
+}
+}
+const headlight=mat(0xfff7dd,.25);
+const taillight=new THREE.MeshStandardMaterial({color:0xe51a2b,emissive:0xc90013,emissiveIntensity:1.3});
+for(const x of [-.78,.78]){
+box(.48,.22,.09,headlight,x,1.27,-2.38,root);
+box(.5,.22,.09,taillight,x,1.27,2.38,root);
+}
+box(1.5,.16,.13,chromeMat,0,.88,-2.39,root);
+if(player){
+const interior=mat(0x20252b);
+box(1.85,.18,.65,interior,0,1.67,-.95,root);
+const steering=new THREE.Mesh(new THREE.TorusGeometry(.32,.055,8,20),darkMat);
+steering.position.set(-.47,1.92,-.92);
+steering.rotation.x=.5;root.add(steering);
+}
+root.userData.cabin=cabin;
+return root;
+}
+
+const car=makeCar(0x087cfa,true);
+scene.add(car);
+car.position.set(0,0,35);
+let heading=0,speed=0,distance=0,cameraMode=0;
+const maxForward=48,maxReverse=-13;
+const keys={gas:false,brake:false,left:false,right:false};
+const keyMap={
+KeyW:"gas",ArrowUp:"gas",
+KeyS:"brake",ArrowDown:"brake",
+KeyA:"left",ArrowLeft:"left",
+KeyD:"right",ArrowRight:"right"
+};
+function reset(){
+car.position.set(0,0,35);heading=0;speed=0;
+}
+function toggleCamera(){
+cameraMode=1-cameraMode;
+document.getElementById("cameraLabel").textContent=
+cameraMode?"الكاميرا الداخلية":"الكاميرا الخلفية";
+}
+document.getElementById("cameraBtn").onclick=toggleCamera;
+document.getElementById("resetBtn").onclick=reset;
+addEventListener("keydown",e=>{
+if(keyMap[e.code]){keys[keyMap[e.code]]=true;e.preventDefault()}
+if(e.code==="KeyC"&&!e.repeat)toggleCamera();
+if(e.code==="KeyR"&&!e.repeat)reset();
+});
+addEventListener("keyup",e=>{
+if(keyMap[e.code]){keys[keyMap[e.code]]=false;e.preventDefault()}
+});
+addEventListener("blur",()=>Object.keys(keys).forEach(k=>keys[k]=false));
+document.querySelectorAll(".touchBtn").forEach(btn=>{
+const key=btn.dataset.key;
+btn.addEventListener("pointerdown",e=>{
+e.preventDefault();btn.setPointerCapture(e.pointerId);
+keys[key]=true;btn.classList.add("pressed");
+});
+function release(){keys[key]=false;btn.classList.remove("pressed")}
+btn.addEventListener("pointerup",release);
+btn.addEventListener("pointercancel",release);
+btn.addEventListener("lostpointercapture",release);
 });
 
-document.addEventListener("keyup", function(e){
-    keys[e.key] = false;
+const traffic=[];
+for(let i=0;i<22;i++){
+const horizontal=i%2===0;
+const lane=lines[Math.floor(rnd()*lines.length)];
+const direction=rnd()<.5?1:-1;
+const vehicle=makeCar(pick([0xf4f4f4,0xe54838,0x34383e,0xe0b742,0x4b7795]),false);
+const t={
+mesh:vehicle,horizontal,lane,direction,
+pos:-480+rnd()*960,velocity:10+rnd()*10
+};
+scene.add(vehicle);traffic.push(t);
+}
+function updateTraffic(dt){
+for(const t of traffic){
+t.pos+=t.direction*t.velocity*dt;
+if(t.pos>540)t.pos=-540;
+if(t.pos< -540)t.pos=540;
+if(t.horizontal){
+t.mesh.position.set(t.pos,0,t.lane+(t.direction>0?5:-5));
+t.mesh.rotation.y=t.direction>0?-Math.PI/2:Math.PI/2;
+}else{
+t.mesh.position.set(t.lane+(t.direction>0?-5:5),0,t.pos);
+t.mesh.rotation.y=t.direction>0?Math.PI:0;
+}
+const dx=t.mesh.position.x-car.position.x;
+const dz=t.mesh.position.z-car.position.z;
+if(Math.abs(dx)<2.2&&Math.abs(dz)<4){
+speed*=-.22;
+car.position.x-=Math.sign(dx||1)*.15;
+car.position.z-=Math.sign(dz||1)*.15;
+}
+}
+}
+
+const clock=new THREE.Clock();
+const lookTarget=new THREE.Vector3();
+const camTarget=new THREE.Vector3();
+let running=false;
+function update(dt){
+const accelerating=keys.gas,braking=keys.brake;
+if(accelerating)speed+=26*dt;
+if(braking)speed-=speed>1?43*dt:17*dt;
+if(!accelerating&&!braking){
+const drag=5*dt;
+speed=Math.abs(speed)<=drag?0:speed-Math.sign(speed)*drag;
+}
+speed=Math.max(maxReverse,Math.min(maxForward,speed));
+const steering=(Number(keys.right)-Number(keys.left));
+if(Math.abs(speed)>.2){
+heading+=steering*dt*1.35*Math.min(Math.abs(speed)/15,1)*(speed>=0?1:-1);
+}
+const forward=new THREE.Vector3(-Math.sin(heading),0,-Math.cos(heading));
+const movement=forward.clone().multiplyScalar(speed*dt);
+car.position.add(movement);
+distance+=Math.abs(speed*dt);
+car.rotation.y=heading;
+for(const w of car.userData.wheels){
+w.wheel.rotation.y+=speed*dt/.76;
+w.rim.rotation.y+=speed*dt/.76;
+if(w.z<0)w.pivot.rotation.y=steering*.3;
+}
+const nearRoadX=lines.some(v=>Math.abs(car.position.x-v)<roadWidth/2+2);
+const nearRoadZ=lines.some(v=>Math.abs(car.position.z-v)<roadWidth/2+2);
+if(!nearRoadX&&!nearRoadZ)speed*=Math.max(0,1-1.5*dt);
+car.position.x=THREE.MathUtils.clamp(car.position.x,-530,530);
+car.position.z=THREE.MathUtils.clamp(car.position.z,-530,530);
+updateTraffic(dt);
+const behind=new THREE.Vector3(0,0,1).applyAxisAngle(new THREE.Vector3(0,1,0),heading);
+if(cameraMode===0){
+camTarget.copy(car.position).addScaledVector(behind,10).add(new THREE.Vector3(0,5.1,0));
+lookTarget.copy(car.position).addScaledVector(forward,9).add(new THREE.Vector3(0,1.8,0));
+}else{
+camTarget.copy(car.position).add(new THREE.Vector3(0,2.07,0));
+camTarget.addScaledVector(forward,.12);
+lookTarget.copy(camTarget).addScaledVector(forward,30);
+}
+camera.position.lerp(camTarget,Math.min(1,dt*(cameraMode?15:5)));
+camera.lookAt(lookTarget);
+document.getElementById("speed").innerHTML=
+Math.round(Math.abs(speed)*3.6)+' <small>KM/H</small>';
+document.getElementById("distance").textContent=
+"المسافة: "+Math.floor(distance)+" م";
+}
+function animate(){
+requestAnimationFrame(animate);
+const dt=Math.min(clock.getDelta(),.04);
+if(running)update(dt);
+renderer.render(scene,camera);
+}
+camera.position.set(0,6,47);
+camera.lookAt(0,1,30);
+animate();
+
+addEventListener("resize",()=>{
+camera.aspect=innerWidth/innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(innerWidth,innerHeight);
 });
-
-
-function startGame(){
-
-    document.getElementById("start").style.display="none";
-
-    player = document.getElementById("player");
-
-    playerX = window.innerWidth / 2 - 35;
-
-    player.style.left = playerX + "px";
-
-    enemies = [
-        document.getElementById("enemy1"),
-        document.getElementById("enemy2"),
-        document.getElementById("enemy3")
-    ];
-
-    enemies.forEach((enemy,index)=>{
-
-        enemy.style.top = (-200 - index*350) + "px";
-
-        let lanes = [
-            window.innerWidth*0.25,
-            window.innerWidth*0.5,
-            window.innerWidth*0.7
-        ];
-
-        enemy.style.left = lanes[index%3] + "px";
-
-    });
-
-    speed = 80;
-
-    gameRunning = true;
-
-    gameLoop();
-}
-
-
-function moveLeft(){
-
-    if(!gameRunning) return;
-
-    playerX -= 70;
-
-    if(playerX < window.innerWidth*0.19){
-        playerX = window.innerWidth*0.19;
-    }
-
-    player.style.left = playerX + "px";
-}
-
-
-function moveRight(){
-
-    if(!gameRunning) return;
-
-    playerX += 70;
-
-    if(playerX > window.innerWidth*0.75){
-        playerX = window.innerWidth*0.75;
-    }
-
-    player.style.left = playerX + "px";
-}
-
-
-function gameLoop(){
-
-    if(!gameRunning) return;
-
-    score++;
-
-    document.getElementById("score").textContent =
-        Math.floor(score/10);
-
-    document.getElementById("speed").textContent =
-        speed + Math.floor(score/100);
-
-    enemies.forEach((enemy,index)=>{
-
-        let top = parseFloat(enemy.style.top);
-
-        top += 7 + speed/80;
-
-        if(top > window.innerHeight){
-
-            top = -250 - Math.random()*500;
-
-            let roadLeft = window.innerWidth*0.22;
-            let roadWidth = window.innerWidth*0.56;
-
-            enemy.style.left =
-                (roadLeft + Math.random()*roadWidth) + "px";
-        }
-
-        enemy.style.top = top + "px";
-
-        checkCollision(player,enemy);
-
-    });
-
-    requestAnimationFrame(gameLoop);
-}
-
-
-function checkCollision(a,b){
-
-    let r1 = a.getBoundingClientRect();
-    let r2 = b.getBoundingClientRect();
-
-    if(
-        r1.left < r2.right &&
-        r1.right > r2.left &&
-        r1.top < r2.bottom &&
-        r1.bottom > r2.top
-    ){
-
-        gameOver();
-    }
-}
-
-
-function gameOver(){
-
-    gameRunning = false;
-
-    document.getElementById("finalScore").textContent =
-        Math.floor(score/10);
-
-    document.getElementById("end").style.display="flex";
-}
-
+document.getElementById("loadStatus").textContent="اللعبة جاهزة!";
+const start=document.getElementById("start");
+start.style.display="block";
+start.onclick=()=>{
+running=true;
+document.getElementById("loading").style.display="none";
+clock.getDelta();
+};
 </script>
-
 </body>
 </html>
